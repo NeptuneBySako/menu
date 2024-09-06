@@ -1,23 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { Fragment } from "react";
+import "./App.css";
+import { data } from "../src/data";
+import SectionTitle from '../src/components/SectionTitle';
+import ItemRow from "../src/components/ItemRow";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App p-5">
+      <h1 className="font-PlayWriteRegular text-4xl mb-9">Neptune by Sako</h1>
+      <div className="flex flex-col items-start w-full">
+        {data.map((section) => {
+          return (
+            <Fragment>
+              <SectionTitle title={section?.title} />
+              {section.items.map((item) => {
+                return (
+                  <ItemRow
+                    name={item?.name}
+                    description={item.description}
+                    price={item.price}
+                  />
+                );
+              })}
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }
