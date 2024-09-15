@@ -13,6 +13,8 @@ const Items = () => {
   const [categories, setCategories] = useState([]);
   const [selectedData, setSelectedData] = useState();
   const [items, setItems] = useState([]);
+  const [allItems, setAllItems] = useState([]);
+  const [search, setSearch] = useState([]);
 
   useEffect(() => {
     getCategories();
@@ -117,9 +119,32 @@ const Items = () => {
 
       console.log(arr, "arr");
       setItems(arr);
+      setAllItems(arr);
     }
   };
 
+  const handleSearch = (value) => {
+    if (value === "") {
+      setSearch("");
+      let allData = allItems;
+      setItems(allData);
+    } else if (value.length < search.length) {
+      setSearch(value);
+      let allData = allItems;
+      let filteredData = allData.filter((x) =>
+        x.title.toLowerCase().includes(value.toLowerCase())
+      );
+
+      setItems(filteredData);
+    } else {
+      setSearch(value);
+      let allData = items;
+      let filteredData = allData.filter((x) =>
+        x.title.toLowerCase().includes(value.toLowerCase())
+      );
+      setItems(filteredData);
+    }
+  };
   return (
     <div>
       <div className="flex flex-col items-start border-b border-b-black w-full p-2">
@@ -132,7 +157,7 @@ const Items = () => {
                 setName(e.target.value);
               }}
               value={name}
-              placeholder="Item title"
+              placeholder="Item name"
               className="mt-3 mb-3 border p-2 mr-3"
             />
             <input
@@ -177,11 +202,21 @@ const Items = () => {
         </div>
       </div>
       <div className="w-full p-2">
+        <div className="flex items-end justify-end">
+          <input
+            type="text"
+            placeholder="Search"
+            className="mt-3 mb-3 border p-2 mr-3"
+            onChange={(e) => {
+              handleSearch(e.target.value);
+            }}
+          />
+        </div>
         <table>
           <thead>
             <tr>
               <th>No.</th>
-              <th>Title</th>
+              <th>Name</th>
               <th>Category</th>
               <th>Price</th>
               <th>Actions</th>

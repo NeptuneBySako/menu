@@ -93,7 +93,7 @@ const Categories = () => {
               setName(e.target.value);
             }}
             value={name}
-            placeholder="Category title"
+            placeholder="Category name"
             className="mt-3 mb-3 border p-2 mr-3"
           />
           <input
@@ -120,7 +120,7 @@ const Categories = () => {
           <thead>
             <tr>
               <th>No.</th>
-              <th>Title</th>
+              <th>Name</th>
               <th>Position In Menu</th>
               <th>Actions</th>
             </tr>
