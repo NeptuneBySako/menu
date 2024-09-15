@@ -4,35 +4,15 @@ import db from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
-const Categories = () => {
+const Sections = () => {
   const [name, setName] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [sections, setSections] = useState([]);
   const [selectedData, setSelectedData] = useState();
   const [position, setPosition] = useState();
-  const [sections, setSections] = useState([]);
-  const [selectedSection, setSelectedSection] = useState();
   useEffect(() => {
-    getCategories();
     getSections();
   }, []);
-
-  const getCategories = async () => {
-    const dataRef = ref(db, "categories");
-    const snapshot = await get(dataRef);
-    if (snapshot.exists()) {
-      let data = snapshot.val();
-      let arr = Object.keys(data).map((id) => {
-        return {
-          ...data[id],
-          id: id,
-        };
-      });
-
-      console.log(arr, "arr");
-      setCategories(arr);
-    }
-  };
 
   const getSections = async () => {
     const dataRef = ref(db, "sections");
@@ -54,15 +34,14 @@ const Categories = () => {
   const saveData = async () => {
     if (!isUpdate) {
       try {
-        const newDocRef = push(ref(db, "categories"));
+        const newDocRef = push(ref(db, "sections"));
         await set(newDocRef, {
           title: name,
           position: position,
-          section: selectedSection,
         });
         console.log("Success");
-        alert("New category created");
-        getCategories();
+        alert("New section created");
+        getSections();
         setName("");
         setPosition("");
       } catch (err) {
@@ -71,17 +50,14 @@ const Categories = () => {
       }
     } else {
       try {
-        console.log(selectedSection, "selectedSection");
-
-        const dataRef = ref(db, "categories/" + selectedData.id);
+        const dataRef = ref(db, "sections/" + selectedData.id);
         await set(dataRef, {
           title: name,
           position: position,
-          section: selectedSection,
         });
         console.log("Success");
-        alert("Category updated successfully");
-        getCategories();
+        alert("Section updated successfully");
+        getSections();
         setIsUpdate(false);
         setSelectedData();
         setName("");
@@ -93,13 +69,13 @@ const Categories = () => {
     }
   };
 
-  const deleteCategory = async (id) => {
+  const deleteSection = async (id) => {
     try {
-      const dataRef = ref(db, "categories/" + id);
+      const dataRef = ref(db, "sections/" + id);
       await remove(dataRef);
       console.log("Success");
-      alert("Category deleted successfully");
-      getCategories();
+      alert("Section deleted successfully");
+      getSections();
     } catch (err) {
       console.log("Error:", err);
       alert("Error: " + err.message);
@@ -109,7 +85,7 @@ const Categories = () => {
   return (
     <div>
       <div className="flex flex-col items-start border-b border-b-black w-full p-2">
-        <h2>{isUpdate ? "Update Category" : "Add New Category"}</h2>
+        <h2>{isUpdate ? "Update Section" : "Add New Section"}</h2>
         <div className="flex items-center justify-start">
           <input
             type="text"
@@ -117,21 +93,9 @@ const Categories = () => {
               setName(e.target.value);
             }}
             value={name}
-            placeholder="Category name"
+            placeholder="Section name"
             className="mt-3 mb-3 border p-2 mr-3"
           />
-          <select
-            className="mt-3 mb-3 border p-2 mr-3"
-            value={selectedSection}
-            onChange={(e) => {
-              console.log(e.target.value, "value");
-              setSelectedSection(e.target.value);
-            }}
-          >
-            {sections?.map((item) => {
-              return <option value={item?.id}>{item?.title}</option>;
-            })}
-          </select>
           <input
             type="number"
             onChange={(e) => {
@@ -157,25 +121,16 @@ const Categories = () => {
             <tr>
               <th>No.</th>
               <th>Name</th>
-              <th>Section</th>
               <th>Position In Menu</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {categories?.map((item, index) => {
+            {sections?.map((item, index) => {
               return (
                 <tr>
                   <td>{index + 1}</td>
                   <td>{capitalizeFirstLetter(item.title)}</td>
-                  <td>
-                    {console.log(sections.find((x) => x.id === item?.section))}
-                    {item?.section
-                      ? capitalizeFirstLetter(
-                          sections.find((x) => x.id === item.section).title
-                        )
-                      : ""}
-                  </td>
                   <td>{item.position}</td>
                   <td>
                     <div className="flex items-center justify-center">
@@ -192,7 +147,7 @@ const Categories = () => {
                       </button>
                       <button
                         onClick={() => {
-                          deleteCategory(item?.id);
+                          deleteSection(item?.id);
                         }}
                       >
                         <FiTrash2 />
@@ -209,4 +164,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default Sections;

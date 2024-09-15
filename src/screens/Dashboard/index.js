@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import Items from "../../components/Items";
 import Categories from "../../components/Categories";
 import { useNavigate } from "react-router-dom";
+import Sections from "../../components/Sections";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showItems, setShowItems] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const login = () => {
     console.log(username, "username");
@@ -69,25 +70,46 @@ const Dashboard = () => {
             <button
               className="ml-3 p-2 w-full"
               style={{
-                backgroundColor: !showItems ? "#C4C4C4" : "transparent",
+                backgroundColor: selectedTab === 0 ? "#C4C4C4" : "transparent",
               }}
               onClick={() => {
-                setShowItems(false);
+                setSelectedTab(0);
+              }}
+            >
+              Sections
+            </button>
+            <button
+              className="ml-3 p-2 w-full"
+              style={{
+                backgroundColor: selectedTab === 1 ? "#C4C4C4" : "transparent",
+              }}
+              onClick={() => {
+                setSelectedTab(1);
               }}
             >
               Categories
             </button>
             <button
               className="ml-3 p-2 w-full"
-              style={{ backgroundColor: showItems ? "#C4C4C4" : "transparent" }}
+              style={{
+                backgroundColor: selectedTab === 2 ? "#C4C4C4" : "transparent",
+              }}
               onClick={() => {
-                setShowItems(true);
+                setSelectedTab(2);
               }}
             >
               Items
             </button>
           </div>
-          <div>{showItems ? <Items /> : <Categories />}</div>
+          <div>
+            {selectedTab === 0 ? (
+              <Sections />
+            ) : selectedTab === 2 ? (
+              <Items />
+            ) : (
+              <Categories />
+            )}
+          </div>
         </div>
       )}
     </div>
