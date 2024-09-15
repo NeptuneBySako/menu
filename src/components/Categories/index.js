@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { ref, set, push, get, remove } from "firebase/database";
 import db from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
 const Categories = () => {
   const [name, setName] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedData, setSelectedData] = useState();
-
+  const [position, setPosition] = useState();
   useEffect(() => {
     getCategories();
   }, []);
@@ -36,11 +37,13 @@ const Categories = () => {
         const newDocRef = push(ref(db, "categories"));
         await set(newDocRef, {
           title: name,
+          position: position,
         });
         console.log("Success");
         alert("New category created");
         getCategories();
         setName("");
+        setPosition("");
       } catch (err) {
         console.log("Error:", err);
         alert("Error: " + err.message);
@@ -50,6 +53,7 @@ const Categories = () => {
         const dataRef = ref(db, "categories/" + selectedData.id);
         await set(dataRef, {
           title: name,
+          position: position,
         });
         console.log("Success");
         alert("Category updated successfully");
@@ -57,6 +61,7 @@ const Categories = () => {
         setIsUpdate(false);
         setSelectedData();
         setName("");
+        setPosition("");
       } catch (err) {
         console.log("Error:", err);
         alert("Error: " + err.message);
@@ -91,6 +96,15 @@ const Categories = () => {
             placeholder="Category title"
             className="mt-3 mb-3 border p-2 mr-3"
           />
+          <input
+            type="number"
+            onChange={(e) => {
+              setPosition(e.target.value);
+            }}
+            value={position}
+            placeholder="Position in menu"
+            className="mt-3 mb-3 border p-2 mr-3"
+          />
           <button
             className="flex items-center justify-center bg-slate-200 w-full pt-2 pb-2 pl-4 pr-4"
             onClick={() => {
@@ -107,6 +121,7 @@ const Categories = () => {
             <tr>
               <th>No.</th>
               <th>Title</th>
+              <th>Position In Menu</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -115,7 +130,8 @@ const Categories = () => {
               return (
                 <tr>
                   <td>{index + 1}</td>
-                  <td>{item.title}</td>
+                  <td>{capitalizeFirstLetter(item.title)}</td>
+                  <td>{item.position}</td>
                   <td>
                     <div className="flex items-center justify-center">
                       <button
@@ -124,6 +140,7 @@ const Categories = () => {
                           setIsUpdate(true);
                           setSelectedData(item);
                           setName(item?.title);
+                          setPosition(item?.position);
                         }}
                       >
                         <FiEdit />

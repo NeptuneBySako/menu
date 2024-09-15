@@ -58,9 +58,11 @@ const Menu = () => {
       dataArr.push({
         id: ind,
         title: category?.title,
+        position: category.position,
         items: itemsCatArr,
       });
     });
+    dataArr.sort((a, b) => a.position - b.position);
     setData(dataArr);
   };
 

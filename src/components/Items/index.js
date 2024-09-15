@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ref, set, push, get, remove } from "firebase/database";
 import db from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
 const Items = () => {
   const [name, setName] = useState("");
@@ -191,11 +192,13 @@ const Items = () => {
               return (
                 <tr>
                   <td>{index + 1}</td>
-                  <td>{item.title}</td>
+                  <td>{capitalizeFirstLetter(item.title)}</td>
                   <td>
-                    {categories.find((x) => x.id === item?.category_id).title}
+                    {capitalizeFirstLetter(
+                      categories.find((x) => x.id === item?.category_id).title
+                    )}
                   </td>
-                  <td>${item.price}</td>
+                  <td>{item.price ? `$${item?.price}` : ""}</td>
                   <td>
                     <div className="flex items-center justify-center">
                       <button
