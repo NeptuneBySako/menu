@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ref, set, push, get, remove } from "firebase/database";
-import db from "../../firebase/firebase.config";
+import * as database from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
@@ -15,7 +15,7 @@ const Sections = () => {
   }, []);
 
   const getSections = async () => {
-    const dataRef = ref(db, "sections");
+    const dataRef = ref(database?.default?.db, "sections");
     const snapshot = await get(dataRef);
     if (snapshot.exists()) {
       let data = snapshot.val();
@@ -34,7 +34,7 @@ const Sections = () => {
   const saveData = async () => {
     if (!isUpdate) {
       try {
-        const newDocRef = push(ref(db, "sections"));
+        const newDocRef = push(ref(database?.default?.db, "sections"));
         await set(newDocRef, {
           title: name,
           position: position,
@@ -50,7 +50,7 @@ const Sections = () => {
       }
     } else {
       try {
-        const dataRef = ref(db, "sections/" + selectedData.id);
+        const dataRef = ref(database?.default?.db, "sections/" + selectedData.id);
         await set(dataRef, {
           title: name,
           position: position,
@@ -71,7 +71,7 @@ const Sections = () => {
 
   const deleteSection = async (id) => {
     try {
-      const dataRef = ref(db, "sections/" + id);
+      const dataRef = ref(database?.default?.db, "sections/" + id);
       await remove(dataRef);
       console.log("Success");
       alert("Section deleted successfully");

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-const SectionsTabs = ({ sections, onClick, selectedCat }) => {
+const CategoriesTabs = ({ categories, onClick, selectedSection }) => {
   const [selected, setSelected] = useState();
   useEffect(() => {
-    if (sections) {
-      setSelected(sections[0]?.id);
+    if (categories) {
+      setSelected(categories[0]?.id);
     }
-  }, [sections]);
+  }, [categories]);
   return (
-    <div className="flex items-center flex-nowrap w-full overflow-scroll mb-5">
-      {sections.map((category) => {
+    <div className="flex items-center flex-nowrap w-screen overflow-scroll">
+      {categories.map((category) => {
         return (
           <button
             onClick={() => {
@@ -29,4 +29,4 @@ const SectionsTabs = ({ sections, onClick, selectedCat }) => {
   );
 };
 
-export default SectionsTabs;
+export default CategoriesTabs;

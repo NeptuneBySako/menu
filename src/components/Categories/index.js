@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ref, set, push, get, remove } from "firebase/database";
-import db from "../../firebase/firebase.config";
+import * as database from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
@@ -18,7 +18,7 @@ const Categories = () => {
   }, []);
 
   const getCategories = async () => {
-    const dataRef = ref(db, "categories");
+    const dataRef = ref(database?.default?.db, "categories");
     const snapshot = await get(dataRef);
     if (snapshot.exists()) {
       let data = snapshot.val();
@@ -28,14 +28,12 @@ const Categories = () => {
           id: id,
         };
       });
-
-      console.log(arr, "arr");
       setCategories(arr);
     }
   };
 
   const getSections = async () => {
-    const dataRef = ref(db, "sections");
+    const dataRef = ref(database?.default?.db, "sections");
     const snapshot = await get(dataRef);
     if (snapshot.exists()) {
       let data = snapshot.val();
@@ -45,8 +43,6 @@ const Categories = () => {
           id: id,
         };
       });
-
-      console.log(arr, "arr");
       setSections(arr);
     }
   };
@@ -54,32 +50,27 @@ const Categories = () => {
   const saveData = async () => {
     if (!isUpdate) {
       try {
-        const newDocRef = push(ref(db, "categories"));
+        const newDocRef = push(ref(database?.default?.db, "categories"));
         await set(newDocRef, {
           title: name,
           position: position,
           section: selectedSection,
         });
-        console.log("Success");
         alert("New category created");
         getCategories();
         setName("");
         setPosition("");
       } catch (err) {
-        console.log("Error:", err);
         alert("Error: " + err.message);
       }
     } else {
       try {
-        console.log(selectedSection, "selectedSection");
-
-        const dataRef = ref(db, "categories/" + selectedData.id);
+        const dataRef = ref(database?.default?.db, "categories/" + selectedData.id);
         await set(dataRef, {
           title: name,
           position: position,
           section: selectedSection,
         });
-        console.log("Success");
         alert("Category updated successfully");
         getCategories();
         setIsUpdate(false);
@@ -87,7 +78,6 @@ const Categories = () => {
         setName("");
         setPosition("");
       } catch (err) {
-        console.log("Error:", err);
         alert("Error: " + err.message);
       }
     }
@@ -95,13 +85,11 @@ const Categories = () => {
 
   const deleteCategory = async (id) => {
     try {
-      const dataRef = ref(db, "categories/" + id);
+      const dataRef = ref(database?.default?.db, "categories/" + id);
       await remove(dataRef);
-      console.log("Success");
       alert("Category deleted successfully");
       getCategories();
     } catch (err) {
-      console.log("Error:", err);
       alert("Error: " + err.message);
     }
   };
@@ -124,7 +112,6 @@ const Categories = () => {
             className="mt-3 mb-3 border p-2 mr-3"
             value={selectedSection}
             onChange={(e) => {
-              console.log(e.target.value, "value");
               setSelectedSection(e.target.value);
             }}
           >
@@ -169,10 +156,9 @@ const Categories = () => {
                   <td>{index + 1}</td>
                   <td>{capitalizeFirstLetter(item.title)}</td>
                   <td>
-                    {console.log(sections.find((x) => x.id === item?.section))}
                     {item?.section
                       ? capitalizeFirstLetter(
-                          sections.find((x) => x.id === item.section).title
+                          sections?.find((x) => x?.id === item?.section)?.title
                         )
                       : ""}
                   </td>

@@ -3,6 +3,7 @@ import Items from "../../components/Items";
 import Categories from "../../components/Categories";
 import { useNavigate } from "react-router-dom";
 import Sections from "../../components/Sections";
+import ImageSection from "../../components/ImageSection";
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ const Dashboard = () => {
     }
   };
   return (
-    <div>
+    <div className="p-5">
       <div className="w-full items-end justify-end flex">
         <button
           className="p-2 bg-slate-300 mb-5"
@@ -100,14 +101,27 @@ const Dashboard = () => {
             >
               Items
             </button>
+            <button
+              className="ml-3 p-2 w-full"
+              style={{
+                backgroundColor: selectedTab === 3 ? "#C4C4C4" : "transparent",
+              }}
+              onClick={() => {
+                setSelectedTab(3);
+              }}
+            >
+              Main Image
+            </button>
           </div>
           <div>
             {selectedTab === 0 ? (
               <Sections />
             ) : selectedTab === 2 ? (
               <Items />
-            ) : (
+            ) : selectedTab === 1 ? (
               <Categories />
+            ) : (
+              <ImageSection />
             )}
           </div>
         </div>

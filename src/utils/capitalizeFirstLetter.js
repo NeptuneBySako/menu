@@ -1,5 +1,6 @@
 export function capitalizeFirstLetter(str) {
-  if (str.length === 0) return str; // Handle empty strings
+  if (!str) return "";
+  if (str.length === 0) return ""; // Handle empty strings
   return str
     .split(" ") // Split the paragraph into words
     .map((word) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ref, set, push, get, remove } from "firebase/database";
-import db from "../../firebase/firebase.config";
+import * as database from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
@@ -22,7 +22,7 @@ const Items = () => {
   }, []);
 
   const getCategories = async () => {
-    const dataRef = ref(db, "categories");
+    const dataRef = ref(database?.default?.db, "categories");
     const snapshot = await get(dataRef);
     if (snapshot.exists()) {
       let data = snapshot.val();
@@ -41,7 +41,7 @@ const Items = () => {
   const saveData = async () => {
     if (!isUpdate) {
       try {
-        const newDocRef = push(ref(db, "items"));
+        const newDocRef = push(ref(database?.default?.db, "items"));
         await set(newDocRef, {
           title: name,
           price: price,
@@ -68,7 +68,7 @@ const Items = () => {
         console.log(selectedCat, "selectedCat");
         console.log(description, "description");
 
-        const dataRef = ref(db, "items/" + selectedData.id);
+        const dataRef = ref(database?.default?.db, "items/" + selectedData.id);
         console.log(dataRef, "dataRef");
         await set(dataRef, {
           title: name,
@@ -94,7 +94,7 @@ const Items = () => {
 
   const deleteItem = async (id) => {
     try {
-      const dataRef = ref(db, "items/" + id);
+      const dataRef = ref(database?.default?.db, "items/" + id);
       await remove(dataRef);
       console.log("Success");
       alert("Item deleted successfully");
@@ -106,7 +106,7 @@ const Items = () => {
   };
 
   const getItems = async () => {
-    const dataRef = ref(db, "items");
+    const dataRef = ref(database?.default?.db, "items");
     const snapshot = await get(dataRef);
     if (snapshot.exists()) {
       let data = snapshot.val();

@@ -4,7 +4,7 @@ import Menu from "./screens/Menu/Menu";
 import Dashboard from "./screens/Dashboard";
 function App() {
   return (
-    <div className="App p-5">
+    <div className="App">
       <Router>
         <Routes>
           <Route path="/" element={<Menu />} />
