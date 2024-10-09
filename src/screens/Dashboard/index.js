@@ -7,7 +7,7 @@ import ImageSection from "../../components/ImageSection";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);

@@ -7,7 +7,7 @@ const SectionsTabs = ({ sections, onClick, selectedCat }) => {
     }
   }, [sections]);
   return (
-    <div className="flex items-center flex-nowrap w-full overflow-scroll mb-5">
+    <div className="flex items-center flex-nowrap w-full overflow-scroll mb-5 no-scrollbar">
       {sections.map((category) => {
         return (
           <button
