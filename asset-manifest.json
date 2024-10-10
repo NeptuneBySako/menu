@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/menu/static/css/main.cae830ee.css",
+    "main.js": "/menu/static/js/main.df574882.js",
+    "static/js/453.1f9c340c.chunk.js": "/menu/static/js/453.1f9c340c.chunk.js",
+    "static/media/image1.jpg": "/menu/static/media/image1.ad43cd4fead0348d2557.jpg",
+    "static/media/PlaywriteCU-Thin.ttf": "/menu/static/media/PlaywriteCU-Thin.34c971eee715436dbe7e.ttf",
+    "static/media/PlaywriteCU-Light.ttf": "/menu/static/media/PlaywriteCU-Light.4869f9398facdaa4b6be.ttf",
+    "static/media/PlaywriteCU-Regular.ttf": "/menu/static/media/PlaywriteCU-Regular.ae8ab5bac40a0768456d.ttf",
+    "static/media/logo.png": "/menu/static/media/logo.a82a51a9fb5f087719d8.png",
+    "static/media/image2.jpeg": "/menu/static/media/image2.e0bc6379d20931cf89cb.jpeg",
+    "index.html": "/menu/index.html",
+    "main.cae830ee.css.map": "/menu/static/css/main.cae830ee.css.map",
+    "main.df574882.js.map": "/menu/static/js/main.df574882.js.map",
+    "453.1f9c340c.chunk.js.map": "/menu/static/js/453.1f9c340c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cae830ee.css",
+    "static/js/main.df574882.js"
+  ]
+}
