@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ref, set, push, get, remove } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { ref, set, push, get, remove, update } from "firebase/database";
 import * as database from "../../firebase/firebase.config";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
@@ -14,7 +14,8 @@ const Items = () => {
   const [selectedData, setSelectedData] = useState();
   const [items, setItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
-  const [search, setSearch] = useState([]);
+  const [search, setSearch] = useState("");
+  const [draggedItem, setDraggedItem] = useState(null);
 
   useEffect(() => {
     getCategories();
@@ -32,7 +33,6 @@ const Items = () => {
           id: id,
         };
       });
-
       setSelectedCat(arr?.[0]?.id);
       setCategories(arr);
     }
@@ -47,12 +47,13 @@ const Items = () => {
           price: price,
           category_id: selectedCat,
           description: description,
+          position:
+            items.filter((item) => item.category_id === selectedCat).length + 1,
         });
         alert("New item created");
         getItems();
         setName("");
         setPrice("");
-        setSelectedCat("");
         setDescription("");
       } catch (err) {
         alert("Error: " + err.message);
@@ -65,6 +66,7 @@ const Items = () => {
           price: price,
           category_id: selectedCat,
           description: description,
+          position: selectedData.position,
         });
         alert("Item updated successfully");
         getItems();
@@ -72,7 +74,6 @@ const Items = () => {
         setSelectedData();
         setName("");
         setPrice("");
-        setSelectedCat("");
         setDescription("");
       } catch (err) {
         alert("Error: " + err.message);
@@ -100,7 +101,16 @@ const Items = () => {
         return {
           ...data[id],
           id: id,
+          position: data[id].position || 0,
         };
+      });
+
+      // Sort by category, then by position
+      arr.sort((a, b) => {
+        if (a.category_id === b.category_id) {
+          return (a.position || 0) - (b.position || 0);
+        }
+        return a.category_id?.localeCompare(b.category_id);
       });
 
       setItems(arr);
@@ -108,146 +118,294 @@ const Items = () => {
     }
   };
 
-  const handleSearch = (value) => {
-    if (value === "") {
-      setSearch("");
-      let allData = allItems;
-      setItems(allData);
-    } else if (value.length < search.length) {
-      setSearch(value);
-      let allData = allItems;
-      let filteredData = allData.filter((x) =>
-        x.title.toLowerCase().includes(value.toLowerCase())
-      );
+  const initializePositions = async () => {
+    try {
+      // Get current items
+      const snapshot = await get(ref(database?.default?.db, "items"));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const updates = {};
 
-      setItems(filteredData);
+        // Group items by category
+        const categories = {};
+        Object.keys(data).forEach((id) => {
+          const categoryId = data[id].category_id || "uncategorized";
+          if (!categories[categoryId]) {
+            categories[categoryId] = [];
+          }
+          categories[categoryId].push({ id, ...data[id] });
+        });
+
+        // Assign positions within each category
+        Object.keys(categories).forEach((categoryId) => {
+          categories[categoryId].forEach((item, index) => {
+            updates[`items/${item.id}/position`] = index + 1;
+          });
+        });
+
+        // Apply updates
+        await update(ref(database?.default?.db), updates);
+        alert("Positions initialized successfully");
+        getItems();
+      }
+    } catch (err) {
+      alert("Error initializing positions: " + err.message);
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearch(value);
+    if (value === "") {
+      setItems(allItems);
     } else {
-      setSearch(value);
-      let allData = items;
-      let filteredData = allData.filter((x) =>
+      const filteredData = allItems.filter((x) =>
         x.title.toLowerCase().includes(value.toLowerCase())
       );
       setItems(filteredData);
     }
   };
+
+  const handleDragStart = (e, item) => {
+    setDraggedItem(item);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", e.target.parentNode);
+  };
+
+  const handleDragOver = (e, item) => {
+    e.preventDefault();
+    // Only allow drop if the target is in the same category
+    if (draggedItem && draggedItem.category_id === item.category_id) {
+      e.dataTransfer.dropEffect = "move";
+    } else {
+      e.dataTransfer.dropEffect = "none";
+    }
+  };
+
+  const handleDrop = async (e, targetItem) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.category_id !== targetItem.category_id) {
+      setDraggedItem(null);
+      return;
+    }
+
+    // Find all items in the same category
+    const categoryItems = items.filter(
+      (item) => item.category_id === draggedItem.category_id
+    );
+
+    // Find the index of the dragged item
+    const draggedIndex = items.findIndex((item) => item.id === draggedItem.id);
+
+    // Find the index of the target item
+    const targetIndex = items.findIndex((item) => item.id === targetItem.id);
+
+    if (
+      draggedIndex === -1 ||
+      targetIndex === -1 ||
+      draggedIndex === targetIndex
+    ) {
+      setDraggedItem(null);
+      return;
+    }
+
+    // Create a new array with the item moved to the new position
+    const newItems = [...items];
+    const [removed] = newItems.splice(draggedIndex, 1);
+    newItems.splice(targetIndex, 0, removed);
+
+    // Update positions for all items in the category
+    const updatedItems = newItems.map((item) => {
+      if (item.category_id === draggedItem.category_id) {
+        // Find the new position within the category
+        const pos = newItems
+          .filter((i) => i.category_id === draggedItem.category_id)
+          .findIndex((i) => i.id === item.id);
+        return {
+          ...item,
+          position: pos + 1,
+        };
+      }
+      return item;
+    });
+
+    setItems(updatedItems);
+
+    // Update positions in Firebase
+    try {
+      const updates = {};
+      updatedItems
+        .filter((item) => item.category_id === draggedItem.category_id)
+        .forEach((item) => {
+          updates[`items/${item.id}/position`] = item.position;
+        });
+
+      await update(ref(database?.default?.db), updates);
+    } catch (err) {
+      console.error("Error updating items:", err);
+      getItems(); // Revert on error
+    }
+
+    setDraggedItem(null);
+  };
+
   return (
-    <div>
-      <div className="flex flex-col items-start border-b border-b-black w-full p-2">
-        <h2>{isUpdate ? "Update Item" : "Add New Item"}</h2>
-        <div>
-          <div className="flex items-center justify-start">
+    <div className="p-4">
+      <div className="flex flex-col items-start border-b border-gray-200 w-full p-4 mb-6">
+        <h2 className="text-xl font-bold mb-4">
+          {isUpdate ? "Update Item" : "Add New Item"}
+        </h2>
+        <div className="w-full">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
             <input
               type="text"
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
+              onChange={(e) => setName(e.target.value)}
               value={name}
               placeholder="Item name"
-              className="mt-3 mb-3 border p-2 mr-3"
+              className="flex-1 min-w-[200px] p-2 border rounded"
             />
             <input
               type="number"
-              onChange={(e) => {
-                setPrice(e.target.value);
-              }}
+              onChange={(e) => setPrice(e.target.value)}
               value={price}
               placeholder="Price"
-              className="mt-3 mb-3 border p-2 mr-3"
+              className="flex-1 min-w-[120px] p-2 border rounded"
             />
             <select
-              className="mt-3 mb-3 border p-2 mr-3"
+              className="flex-1 min-w-[200px] p-2 border rounded"
               value={selectedCat}
-              onChange={(e) => {
-                setSelectedCat(e.target.value);
-              }}
+              onChange={(e) => setSelectedCat(e.target.value)}
             >
-              {categories?.map((item) => {
-                return <option value={item?.id}>{item?.title}</option>;
-              })}
+              {categories?.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.title}
+                </option>
+              ))}
             </select>
+            {/* <button
+              onClick={initializePositions}
+              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            >
+              Initialize Positions
+            </button> */}
           </div>
           <textarea
-            type="text"
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
+            onChange={(e) => setDescription(e.target.value)}
             value={description}
             placeholder="Description"
-            rows="5"
-            className="mt-3 mb-3 border p-2 mr-3 w-full"
+            rows="3"
+            className="w-full p-2 border rounded mb-3"
           />
           <button
-            className="flex items-center justify-center bg-slate-200 w-full pt-2 pb-2 pl-4 pr-4"
-            onClick={() => {
-              saveData();
-            }}
+            className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+            onClick={saveData}
           >
             {isUpdate ? "Update" : "Add"}
           </button>
         </div>
       </div>
+
       <div className="w-full p-2">
-        <div className="flex items-end justify-end">
+        <div className="flex justify-end mb-4">
           <input
             type="text"
-            placeholder="Search"
-            className="mt-3 mb-3 border p-2 mr-3"
-            onChange={(e) => {
-              handleSearch(e.target.value);
-            }}
+            placeholder="Search items..."
+            className="p-2 border rounded w-full max-w-md"
+            onChange={(e) => handleSearch(e.target.value)}
+            value={search}
           />
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items?.map((item, index) => {
-              return (
-                <tr>
-                  <td>{index + 1}</td>
-                  <td>{capitalizeFirstLetter(item.title)}</td>
-                  <td>
-                    {capitalizeFirstLetter(
-                      categories.find((x) => x.id === item?.category_id).title
-                    ) ?? ""}
-                  </td>
-                  <td>{item.price ? `$${item?.price}` : ""}</td>
-                  <td>
-                    <div className="flex items-center justify-center">
-                      <button
-                        className="mr-5"
-                        onClick={() => {
-                          setIsUpdate(true);
-                          setSelectedData(item);
-                          setName(item?.title);
-                          setDescription(item?.description);
-                          setPrice(item?.price);
-                          setSelectedCat(item?.category_id);
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full border">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="p-3 text-left border">No.</th>
+                <th className="p-3 text-left border">Name</th>
+                <th className="p-3 text-left border">Category</th>
+                <th className="p-3 text-left border">Price</th>
+                <th className="p-3 text-left border">Position</th>
+                <th className="p-3 text-left border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((category) => {
+                const categoryItems = items
+                  .filter((item) => item.category_id === category.id)
+                  .sort((a, b) => (a.position || 0) - (b.position || 0));
+
+                if (categoryItems.length === 0) return null;
+
+                return (
+                  <React.Fragment key={`category-${category.id}`}>
+                    <tr className="bg-gray-100">
+                      <td colSpan="6" className="p-3 font-bold border">
+                        {capitalizeFirstLetter(category.title)}
+                      </td>
+                    </tr>
+                    {categoryItems.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, item)}
+                        onDragOver={(e) => handleDragOver(e, item)}
+                        onDrop={(e) => handleDrop(e, item)}
+                        className={`hover:bg-gray-50 ${
+                          draggedItem?.id === item.id ? "bg-blue-50" : ""
+                        }`}
+                        style={{
+                          cursor:
+                            draggedItem?.category_id === item.category_id
+                              ? "move"
+                              : "no-drop",
+                          opacity:
+                            draggedItem &&
+                            draggedItem.category_id !== item.category_id
+                              ? 0.5
+                              : 1,
                         }}
                       >
-                        <FiEdit />
-                      </button>
-                      <button
-                        onClick={() => {
-                          deleteItem(item?.id);
-                        }}
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        <td className="p-3 border">{index + 1}</td>
+                        <td className="p-3 border">
+                          {capitalizeFirstLetter(item.title)}
+                        </td>
+                        <td className="p-3 border">
+                          {capitalizeFirstLetter(category.title)}
+                        </td>
+                        <td className="p-3 border">
+                          {item.price ? `$${item.price}` : ""}
+                        </td>
+                        <td className="p-3 border">{item.position || "N/A"}</td>
+                        <td className="p-3 border">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              className="text-blue-500 hover:text-blue-700"
+                              onClick={() => {
+                                setIsUpdate(true);
+                                setSelectedData(item);
+                                setName(item.title);
+                                setDescription(item.description);
+                                setPrice(item.price);
+                                setSelectedCat(item.category_id);
+                              }}
+                            >
+                              <FiEdit size={18} />
+                            </button>
+                            <button
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => deleteItem(item.id)}
+                            >
+                              <FiTrash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

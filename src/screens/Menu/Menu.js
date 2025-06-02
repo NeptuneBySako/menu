@@ -44,6 +44,7 @@ const Menu = () => {
           id: id,
         };
       });
+      arr.sort((a, b) => a.position - b.position);
       getCategories(arr[0].id);
       setSections(arr);
     }
@@ -70,6 +71,7 @@ const Menu = () => {
         };
       });
     }
+    categoriesArr.sort((a, b) => a.position - b.position);
     getItems(categoriesArr[0]?.id);
     setCategories(categoriesArr);
   };
@@ -94,7 +96,7 @@ const Menu = () => {
       });
     }
 
-    setItems(itemsArr);
+    setItems(itemsArr.sort((a, b) => a.position - b.position));
   };
 
   useEffect(() => {
@@ -106,7 +108,7 @@ const Menu = () => {
         <img src={Logo} alt="logo" className="w-20 h-20" />
         <div className="flex flex-col items-end">
           <p className="text-left text-xs">Neptune grill house</p>
-          <p className="text-left text-xs">Bnachii Lake</p>
+          <p className="text-left text-xs">Ehden</p>
           <p className="text-left text-xs">76/776774 or 71/006575</p>
         </div>
         <button
