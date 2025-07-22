@@ -7,9 +7,9 @@ import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import * as database from "../../firebase/firebase.config";
 import SectionsTabs from "../../components/SectionsTabs";
 import CategoriesTabs from "../../components/CategoriesTabs";
-import RestImage from "../../assets/image1.jpg";
-import Logo from "../../assets/logo.png";
-import RestImage2 from "../../assets/image2.jpeg";
+
+import Logo from "../../assets/images/new_logo.jpeg";
+
 const Menu = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -102,49 +102,44 @@ const Menu = () => {
   useEffect(() => {
     // console.log(selectedSection, "selectedSection");
   }, [sections, categories, items, selectedSection]);
+
   return (
     <Fragment>
-      <div className="p-2 flex flex-row items-center justify-between">
-        <img src={Logo} alt="logo" className="w-20 h-20" />
-        <div className="flex flex-col items-end">
-          <p className="text-left text-xs">Neptune grill house</p>
-          <p className="text-left text-xs">Ehden</p>
-          <p className="text-left text-xs">76/776774 or 71/006575</p>
-        </div>
-        <button
-          className="hidden lg:block p-2 bg-slate-300 mb-5 rounded-xl  h-fit items-center "
-          onClick={() => {
-            navigate("/dashboard");
+      <div className="flex flex-col items-start w-screen  bg-center h-80 relative bg-[#253409]">
+        <div
+          className="flex flex-col items-start w-[100%] bg-contain bg-center p-3 h-80 relative bg-['#253409']"
+          style={{
+            backgroundImage: `url(${Logo})`,
+            backgroundRepeat: "no-repeat",
           }}
         >
-          Login
-        </button>
-      </div>
-      <div
-        className="flex flex-col items-start w-screen bg-cover bg-center p-3 h-72 relative"
-        style={{
-          backgroundImage: imageUrl ? `url(${imageUrl})` : `url(${RestImage2})`, //imageUrl != "" ? `url(${imageUrl})` : "#43A6C6",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="absolute bottom-4">
-          <SectionsTabs
-            sections={sections}
-            onClick={(section) => {
-              getCategories(section?.id);
+          <button
+            className="hidden lg:block p-2 bg-slate-300 mb-5 rounded-xl  h-fit items-center "
+            onClick={() => {
+              navigate("/dashboard");
             }}
-          />
-          <CategoriesTabs
-            categories={categories}
-            onClick={(cat) => {
-              getItems(cat?.id);
-            }}
-            selectedSection={selectedSection}
-          />
+          >
+            Login
+          </button>
         </div>
       </div>
       <div className="p-3">
-        <div className="flex flex-col items-start w-full mt-2 border-2 rounded-lg border-[#43A6C6] pt-2">
+        <SectionsTabs
+          sections={sections}
+          onClick={(section) => {
+            getCategories(section?.id);
+          }}
+        />
+        <CategoriesTabs
+          categories={categories}
+          onClick={(cat) => {
+            getItems(cat?.id);
+          }}
+          selectedSection={selectedSection}
+        />
+      </div>
+      <div className="p-3">
+        <div className="flex flex-col items-start w-full mt-2 border-2 rounded-lg border-[#253409] pt-2">
           {items.map((item) => {
             return (
               <ItemRow

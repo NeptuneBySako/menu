@@ -18,10 +18,17 @@ const SectionsTabs = ({ sections, onClick, selectedCat }) => {
             className="w-auto text-nowrap p-2 rounded-xl mr-3"
             style={{
               backgroundColor:
-                selected === category?.id ? "#43A6C6" : "#C4C4C4",
+                selected === category?.id ? "#253409" : "#C4C4C4",
             }}
           >
-            {category.title}
+            <p
+              className="text-xl"
+              style={{
+                color: selected == category?.id ? "#fff" : "#000",
+              }}
+            >
+              {category.title}
+            </p>
           </button>
         );
       })}
