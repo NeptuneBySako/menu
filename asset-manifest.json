@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/menu/static/css/main.77f3eec3.css",
-    "main.js": "/menu/static/js/main.88b4c5da.js",
+    "main.css": "/menu/static/css/main.2434e1c8.css",
+    "main.js": "/menu/static/js/main.b0fafeb2.js",
     "static/js/453.1f9c340c.chunk.js": "/menu/static/js/453.1f9c340c.chunk.js",
-    "static/media/image1.jpg": "/menu/static/media/image1.ad43cd4fead0348d2557.jpg",
     "static/media/PlaywriteCU-Thin.ttf": "/menu/static/media/PlaywriteCU-Thin.34c971eee715436dbe7e.ttf",
     "static/media/PlaywriteCU-Light.ttf": "/menu/static/media/PlaywriteCU-Light.4869f9398facdaa4b6be.ttf",
     "static/media/PlaywriteCU-Regular.ttf": "/menu/static/media/PlaywriteCU-Regular.ae8ab5bac40a0768456d.ttf",
-    "static/media/logo.png": "/menu/static/media/logo.a82a51a9fb5f087719d8.png",
-    "static/media/image2.jpeg": "/menu/static/media/image2.e0bc6379d20931cf89cb.jpeg",
+    "static/media/new_logo.jpeg": "/menu/static/media/new_logo.ef657a8e6c558651d1a8.jpeg",
+    "static/media/more-sugar.thin.ttf": "/menu/static/media/more-sugar.thin.d3d455c8722031d5d420.ttf",
+    "static/media/Railey-PersonalUse.ttf": "/menu/static/media/Railey-PersonalUse.385954327a3ec667208f.ttf",
     "index.html": "/menu/index.html",
-    "main.77f3eec3.css.map": "/menu/static/css/main.77f3eec3.css.map",
-    "main.88b4c5da.js.map": "/menu/static/js/main.88b4c5da.js.map",
+    "main.2434e1c8.css.map": "/menu/static/css/main.2434e1c8.css.map",
+    "main.b0fafeb2.js.map": "/menu/static/js/main.b0fafeb2.js.map",
     "453.1f9c340c.chunk.js.map": "/menu/static/js/453.1f9c340c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.77f3eec3.css",
-    "static/js/main.88b4c5da.js"
+    "static/css/main.2434e1c8.css",
+    "static/js/main.b0fafeb2.js"
   ]
 }
